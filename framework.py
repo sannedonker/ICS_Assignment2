@@ -28,6 +28,7 @@ def sir_event_demo(y, t, beta, gamma):
     # birth, transmission, recovery, death X, death Y, death Z
     rates = [mu * N, beta * X * Y / N, gamma * Y, mu * X, mu * Y, mu * Z]
 
+    counter = 0
     for i in t:
 
         rates = [mu * N, beta * X * Y / N, gamma * Y, mu * X, mu * Y, mu * Z]
@@ -35,7 +36,11 @@ def sir_event_demo(y, t, beta, gamma):
         dt = []
         for j in range(6):
             u = np.random.uniform(0, 1)
-            dt.append(-np.log(u) / rates[j])
+            if rates[j] < 0.0001:
+                dt.append(100000)
+                counter += 1
+            else:
+                dt.append(-np.log(u) / rates[j])
 
         first_event = dt.index(min(dt))
 
