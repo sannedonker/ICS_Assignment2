@@ -48,20 +48,21 @@ def variability(runs, initial_values, t, beta, gamma):
 def variability2(runs, initial_values, t, beta, gamma):
     """
     Plots the mean, max, and min value over runs number of runs of X, Y, Z
+    For constant population, if pop not constant uncomment the N_list lines
     """
 
     # make a list with runs list of X, Y, Z and N
     X_list = []
     Y_list = []
     Z_list = []
-    # N_list = []
+    N_list = []
     for i in range(runs):
         outcome = framework.sir_event_demo(initial_values, t, beta, gamma)
 
         X_list.append(outcome[0])
         Y_list.append(outcome[1])
         Z_list.append(outcome[2])
-        # N_list.append(outcome[3])
+        N_list.append(outcome[3])
 
     outcomes = [X_list, Y_list, Z_list]
 
@@ -106,4 +107,4 @@ t = np.linspace(0, 1000, 10000)
 beta = 3
 gamma = 1
 mu = 1 / 60
-variability2(100, y0, t, beta, gamma)
+variability2(3, y0, t, beta, gamma)
