@@ -332,33 +332,72 @@ def sir_event_demo_imports(y, t, beta, gamma):
     return X_list, Y_list, Z_list, N_list, time_list
 
 
-N0 = 1000
-Y0 = 10
+N0 = 10000
+Y0 = 100
 Z0 = 0
 X0 = N0 - Y0 - Z0
 y0 = X0, Y0, Z0, N0
 
-# t = np.linspace(0, 1000, 10000)
-t = 500
-beta = 1 / 3
-gamma = 0.01
-mu = 5e-3
+
+t = 100
+# beta = 1 / 3
+# gamma = 0.01
+beta = 1/2
+gamma = 1 / 6
+mu = 5e-2
 # rho = 0.3
 delta = 0.01
 epsilon = 0.001
 
+def diff(y, t, beta, gamma):
+    S, I, R, N = y
+    dSdt = mu * N -beta * S * I / N - mu * S
+    dIdt = beta * S * I / N - gamma * I - mu * I
+    dRdt = gamma * I - mu * R
+    dNdt = dSdt + dIdt + dRdt
+    return [dSdt, dIdt, dRdt, dNdt]
 
-
-X, Y, Z, N, time_list = sir_event_demo_imports(y0, t, beta, gamma)
+t = 150
+X, Y, Z, N, time_list = sir_event_demo(y0, t, beta, gamma)
 # print(time_list)
 
- # plot S(t), I(t) and R(t)
-plt.plot(time_list, X, 'b', label="Susceptible")
-plt.plot(time_list, Y, 'r', label="Infected")
-plt.plot(time_list, Z, 'g', label="Recovered")
-plt.plot(time_list, N, 'y', label="Population")
-plt.xlabel("Time", fontsize=12)
-plt.ylabel("Population", fontsize=12)
-plt.legend()
+plt.plot(X, Y, 'r', label="Stochastic")
 
+t = np.linspace(0, 150, 1000)
+
+ret = odeint(diff, y0, t, args=(beta, gamma))
+X, Y, Z, N = ret.T
+plt.plot(X, Y, 'b', label="Deterministic")
+
+
+# # NEGATIVE COVARIANCE EXPERIMENT
+# def negative_covariance(X, Y):
+#     two_d = np.vstack((np.asarray(X), np.asarray(Y)))
+#     print(np.cov(two_d))
+#
+# negative_covariance(X, Y)
+
+# PHASEPOLOT INCREASED TRANSIENTS
+# plt.plot(X, Y)
+
+plt.xlabel("Number of susceptible individuals", fontsize=12)
+plt.ylabel("Number of infected individuals", fontsize=12)
+plt.ticklabel_format(style='sci', scilimits=(0,0))
+plt.legend()
+plt.savefig("phaseplot_transients.png", dpi=300)
 plt.show()
+
+
+
+#  # plot S(t), I(t) and R(t)
+# plt.plot(time_list, X, 'b', label="Susceptible")
+# plt.plot(time_list, Y, 'r', label="Infected")
+# # plt.plot(time_list, Z, 'g', label="Recovered")
+# # plt.plot(time_list, N, 'y', label="Population")
+# plt.xlabel("Time", fontsize=12)
+# plt.ylabel("Population", fontsize=12)
+# plt.grid(True, axis='x')
+# plt.legend()
+#
+# plt.savefig("negative_covariance.png", dpi=300)
+# plt.show()

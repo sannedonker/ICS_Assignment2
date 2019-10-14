@@ -113,16 +113,17 @@ def variability2(runs, initial_values, t, beta, gamma):
     # plt.legend(handles=[blue, red, green])
 
 
-
-N0 = 5000
-Y0 = 300
+N0 = 1000
+Y0 = 100
 Z0 = 0
 X0 = N0 - Y0 - Z0
 y0 = X0, Y0, Z0, N0
 
-# t = np.linspace(0, 1000, 10000)
-t = 100
+t = 50
 beta = 5
 gamma = 1 / 2
-mu = 1 / 50
+mu = 5e-2
+# rho = 0.3
+delta = 0.01
+epsilon = 0.001
 variability2(100, y0, t, beta, gamma)
