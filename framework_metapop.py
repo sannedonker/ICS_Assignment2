@@ -21,13 +21,13 @@ def metapop(pop_y, t):
     """
     """
 
-    # DIT IS ALLEEN VOOR TESTEN
-    birth = 0
-    transmission = 0
-    recovery = 0
-    deathX = 0
-    deathY = 0
-    deathZ = 0
+    # # DIT IS ALLEEN VOOR TESTEN
+    # birth = 0
+    # transmission = 0
+    # recovery = 0
+    # deathX = 0
+    # deathY = 0
+    # deathZ = 0
 
     time = 0
     time_list = [0]
@@ -86,32 +86,32 @@ def metapop(pop_y, t):
                 if next_event == 0:
                     X = X + 1
                     N = N + 1
-                    birth += 1
+                    # birth += 1
 
                 elif next_event == 1:
                     X = X - 1
                     Y = Y + 1
-                    transmission += 1
+                    # transmission += 1
 
                 elif next_event == 2:
                     Y = Y - 1
                     Z = Z + 1
-                    recovery += 1
+                    # recovery += 1
 
                 elif next_event == 3:
                     X = X - 1
                     N = N -1
-                    deathX += 1
+                    # deathX += 1
 
                 elif next_event == 4:
                     Y = Y - 1
                     N = N - 1
-                    deathY += 1
+                    # deathY += 1
 
                 else:
                     Z = Z - 1
                     N = N - 1
-                    deathZ += 1
+                    # deathZ += 1
 
             pop.get("X").append(X)
             pop.get("Y").append(Y)
@@ -123,7 +123,7 @@ def metapop(pop_y, t):
         time += min(dt)
         time_list.append(time)
 
-    print(birth, transmission, recovery, deathX, deathY, deathZ)
+    # print(birth, transmission, recovery, deathX, deathY, deathZ)
 
     return pop_y, time_list
 
