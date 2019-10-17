@@ -18,16 +18,6 @@ import matplotlib as mpl
 
 
 def metapop(pop_y, t):
-    """
-    """
-
-    # # DIT IS ALLEEN VOOR TESTEN
-    # birth = 0
-    # transmission = 0
-    # recovery = 0
-    # deathX = 0
-    # deathY = 0
-    # deathZ = 0
 
     time = 0
     time_list = [0]
@@ -40,11 +30,6 @@ def metapop(pop_y, t):
             Y = pop.get("Y")[-1]
             Z = pop.get("Z")[-1]
             N = pop.get("N")[-1]
-
-            # ONDERSTAANDE ALLEEN ALS BETA GAMMA ENZO VERSCHILLEN
-            # beta = pop.get("beta")
-            # gamma = pop.get("gamma")
-            # mu = pop.get("mu")
 
             # calculate labda
             sum = 0
@@ -81,37 +66,30 @@ def metapop(pop_y, t):
             # the population in which the event happens
             if i == pop_event:
                 next_event = next_event % len(rate_list)
-                # print(next_event)
 
                 if next_event == 0:
                     X = X + 1
                     N = N + 1
-                    # birth += 1
 
                 elif next_event == 1:
                     X = X - 1
                     Y = Y + 1
-                    # transmission += 1
 
                 elif next_event == 2:
                     Y = Y - 1
                     Z = Z + 1
-                    # recovery += 1
 
                 elif next_event == 3:
                     X = X - 1
                     N = N -1
-                    # deathX += 1
 
                 elif next_event == 4:
                     Y = Y - 1
                     N = N - 1
-                    # deathY += 1
 
                 else:
                     Z = Z - 1
                     N = N - 1
-                    # deathZ += 1
 
             pop.get("X").append(X)
             pop.get("Y").append(Y)
@@ -123,12 +101,10 @@ def metapop(pop_y, t):
         time += min(dt)
         time_list.append(time)
 
-    # print(birth, transmission, recovery, deathX, deathY, deathZ)
-
     return pop_y, time_list
 
 
-# Parameters question 1
+# EXPERIMENT 1
 N = 1000
 Y = 100
 Z = 0
@@ -140,37 +116,59 @@ gamma = 1
 mu = 0.05
 rho = [[1, 0.1], [0.1, 1]]
 
-# ALS BETA, GAMMA EN MU ALIJTD HETZELFDE ZIJN KOST DIT VEEL EXTRA TIJD DUS ERUIT HALEN
-pop_1 = {"X" : [X], "Y" : [Y], "Z" : [Z], "N" : [N], "beta" : 3, "gamma" : 1, "mu" : 0.05}
-pop_2 = {"X" : [N], "Y" : [0], "Z" : [Z], "N" : [N], "beta" : 3, "gamma" : 1, "mu" : 0.05}
+pop_1 = {"X" : [X], "Y" : [Y], "Z" : [Z], "N" : [N]}
+pop_2 = {"X" : [N], "Y" : [0], "Z" : [Z], "N" : [N]}
 
-
-# Parameters question 2
-N = 1000
-Y = 100
-Z = 0
-X = N - Y - Z
-
-t = 10
-beta = 3
-gamma = 1
-mu = 0.05
-rho = [[1, 0.4, 0.4, 0, 0.1], [0.4, 1, 0, 0.4, 0], [0.4, 0, 1, 0, 0.1], [0, 0.4, 0, 1, 0], [0.4, 0, 0.1, 0, 1]]
-
-# ALS BETA, GAMMA EN MU ALIJTD HETZELFDE ZIJN KOST DIT VEEL EXTRA TIJD DUS ERUIT HALEN
-pop_1 = {"X" : [X], "Y" : [Y], "Z" : [Z], "N" : [N], "beta" : 3, "gamma" : 1, "mu" : 0.05}
-pop_2 = {"X" : [N], "Y" : [0], "Z" : [Z], "N" : [N], "beta" : 3, "gamma" : 1, "mu" : 0.05}
-pop_3 = {"X" : [N], "Y" : [0], "Z" : [Z], "N" : [N], "beta" : 3, "gamma" : 1, "mu" : 0.05}
-pop_4 = {"X" : [N], "Y" : [0], "Z" : [Z], "N" : [N], "beta" : 3, "gamma" : 1, "mu" : 0.05}
-pop_5 = {"X" : [N], "Y" : [0], "Z" : [Z], "N" : [N], "beta" : 3, "gamma" : 1, "mu" : 0.05}
-
-
-pop_y = [pop_1, pop_2, pop_3, pop_4, pop_5]
+pop_y = [pop_1, pop_2]
 
 pop_dict_list, time_list = metapop(pop_y, t)
+
+zoom = int(len(time_list) / 3)
+for i in range(len(pop_dict_list)):
+    plt.plot(time_list[:zoom], pop_dict_list[i].get("Y")[:zoom], label="Population " + str(i + 1))
+
+plt.legend()
+plt.xlabel("Time", fontsize=12)
+plt.ylabel("Number of infected individuals", fontsize=12)
+plt.savefig("metapop_exp1_zoom.png", dpi=300)
+plt.show()
 
 for i in range(len(pop_dict_list)):
     plt.plot(time_list, pop_dict_list[i].get("Y"), label="Population " + str(i + 1))
 
 plt.legend()
+plt.xlabel("Time", fontsize=12)
+plt.ylabel("Number of infected individuals", fontsize=12)
+plt.savefig("metapop_exp1_no_zoom.png", dpi=300)
 plt.show()
+
+# # EXPERIMENT 2
+# N = 1000
+# Y = 100
+# Z = 0
+# X = N - Y - Z
+#
+# t = 50
+# beta = 3
+# gamma = 1
+# mu = 0.05
+# rho = [[1, 0.1, 0.9, 0, 0], [0.1, 1, 0, 0.1, 0], [0.9, 0, 1, 0, 0.9], [0, 0.1, 0, 1, 0], [0, 0, 0.9, 0, 1]]
+#
+# pop_1 = {"X" : [X], "Y" : [Y], "Z" : [Z], "N" : [N], "beta" : 3, "gamma" : 1, "mu" : 0.05}
+# pop_2 = {"X" : [N], "Y" : [0], "Z" : [Z], "N" : [N], "beta" : 3, "gamma" : 1, "mu" : 0.05}
+# pop_3 = {"X" : [N], "Y" : [0], "Z" : [Z], "N" : [N], "beta" : 3, "gamma" : 1, "mu" : 0.05}
+# pop_4 = {"X" : [N], "Y" : [0], "Z" : [Z], "N" : [N], "beta" : 3, "gamma" : 1, "mu" : 0.05}
+# pop_5 = {"X" : [N], "Y" : [0], "Z" : [Z], "N" : [N], "beta" : 3, "gamma" : 1, "mu" : 0.05}
+#
+# pop_y = [pop_1, pop_2, pop_3, pop_4, pop_5]
+#
+# pop_dict_list, time_list = metapop(pop_y, t)
+#
+# for i in range(len(pop_dict_list)):
+#     plt.plot(time_list, pop_dict_list[i].get("Y"), label="Population " + str(i + 1))
+#
+# plt.legend()
+# plt.xlabel("Time", fontsize=12)
+# plt.ylabel("Number of infected individuals", fontsize=12)
+# plt.savefig("metapop_t_50_2.png", dpi=300)
+# plt.show()

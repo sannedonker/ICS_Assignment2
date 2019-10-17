@@ -2,6 +2,7 @@ import numpy as np
 import math
 import networkx as nx
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def get_neighbor_matrix(n, rho):
@@ -62,18 +63,8 @@ def generate_populations(n, start_infection, X, Y, Z, N):
     return pop_list
 
 def metapop(pop_y, rho, beta, gamma, mu, t):
-    """
-    """
 
-    # # DIT IS ALLEEN VOOR TESTEN
-    # birth = 0
-    # transmission = 0
-    # recovery = 0
-    # deathX = 0
-    # deathY = 0
-    # deathZ = 0
-
-    rho_matrix = get_rho_matrix(len(pop_y), rho)
+    rho_matrix = get_rho_matrix(int(math.sqrt(len(pop_y))), rho)
 
     time = 0
     time_list = [0]
@@ -87,16 +78,10 @@ def metapop(pop_y, rho, beta, gamma, mu, t):
             Z = pop.get("Z")[-1]
             N = pop.get("N")[-1]
 
-            # ONDERSTAANDE ALLEEN ALS BETA GAMMA ENZO VERSCHILLEN
-            # beta = pop.get("beta")
-            # gamma = pop.get("gamma")
-            # mu = pop.get("mu")
-
             # calculate force of infection
             sum_ji = 0
             sum_ij = 0
             for j in range(len(pop_y)):
-
                 sum_ji += rho_matrix[j][i]
                 sum_ij += rho_matrix[i][j] * pop_y[j].get("Y")[-1]
             foi = beta * X * ((1 - sum_ji) * Y + sum_ij) / N
@@ -130,37 +115,30 @@ def metapop(pop_y, rho, beta, gamma, mu, t):
             # the population in which the event happens
             if i == pop_event:
                 next_event = next_event % len(rate_list)
-                # print(next_event)
 
                 if next_event == 0:
                     X = X + 1
                     N = N + 1
-                    # birth += 1
 
                 elif next_event == 1:
                     X = X - 1
                     Y = Y + 1
-                    # transmission += 1
 
                 elif next_event == 2:
                     Y = Y - 1
                     Z = Z + 1
-                    # recovery += 1
 
                 elif next_event == 3:
                     X = X - 1
                     N = N -1
-                    # deathX += 1
 
                 elif next_event == 4:
                     Y = Y - 1
                     N = N - 1
-                    # deathY += 1
 
                 else:
                     Z = Z - 1
                     N = N - 1
-                    # deathZ += 1
 
             pop.get("X").append(X)
             pop.get("Y").append(Y)
@@ -172,21 +150,60 @@ def metapop(pop_y, rho, beta, gamma, mu, t):
         time += min(dt)
         time_list.append(time)
 
-    # print(birth, transmission, recovery, deathX, deathY, deathZ)
-
     return pop_y, time_list
 
 def lattice_model(n, rho, t, start_infection, X, Y, Z, N, beta, gamma, mu):
 
-    # rho_matrix = get_rho_matrix(n, rho)
     pops = generate_populations(n * n, start_infection, X, Y, Z, N)
     pops_over_time, time_list = metapop(pops, rho, beta, gamma, mu, t)
 
+    # comment this when function is used for calculating speed of infection
+    # generate plot with the course of infection
     for i in range(len(pops_over_time)):
-        plt.plot(time_list, pops_over_time[i].get("Y"), label="Population " + str(i + 1))
+        plt.plot(time_list, pops_over_time[i].get("Y"), label="pop " + str(i))
 
-    plt.legend()
+    plt.legend(bbox_to_anchor=(1.05, 1), ncol = 2, fontsize=15)
+    plt.savefig("lattice_sizes.png", dpi=300)
+    plt.xlabel("Time", fontsize=18)
+    plt.ylabel("Number of infected individuals", fontsize=18)
     plt.show()
+
+    # comment this when function is used for calculating speed of infection
+    # generate heatmap
+    time_steps = int(len(time_list) / 10)
+    heat_plots = []
+    for i in range(10):
+        print(i * time_steps)
+        heatmap(pops_over_time, int(i * time_steps), "_sizes_" + str(i))
+
+    # calculate speed of infection
+    furthest_pop = pops_over_time[-1].get("Y")
+    for i in range(len(furthest_pop)):
+        if furthest_pop[i] != 0:
+            return time_list[i]
+
+
+def heatmap(pops, t, name):
+    n = int(math.sqrt(len(pops)))
+    matrix = []
+    for i in range(len(pops)):
+        if i % n == 0:
+            if i != 0:
+                matrix.append(row)
+            row = [pops[i].get("Y")[t]]
+        else:
+            row.append(pops[i].get("Y")[t])
+
+    matrix.append(row)
+
+    matrix = np.array(matrix)
+    plt.imshow(matrix)
+    plt.colorbar()
+    plt.draw()
+    plt.clim(0, 50)
+    plt.savefig("heatmap_" + name + ".png", dpi=300)
+    plt.show()
+
 
 N = 100
 Y = 10
@@ -197,19 +214,25 @@ beta = 3
 gamma = 1
 mu = 0.05
 
-t = 30
+t = 25
 rho = 0.1
-grid_size = 4
-start_infection = 6
-
-lattice_model(grid_size, rho, t, start_infection, X, Y, Z, N, beta, gamma, mu)
-
+grid_size = 6
+start_infection = 0
+rho_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
 
-# rho = get_rho_matrix(3, 0.1)
-# print(rho)
-# print(rho[0])
-# print(rho[0][0])
-# print(rho[1])
-# print(rho[1][0])
-# print(rho[0][1])
+def speed_of_infection(n, rho_list):
+    """
+    Calculate the average of the speed of infection over n runs
+    """
+    averages = []
+    for j in rho_list:
+        distance_time = []
+        for i in range(n):
+            distance_time.append(lattice_model(grid_size, j, t, start_infection, X, Y, Z, N, beta, gamma, mu))
+        average = sum(distance_time) / n
+        averages.append(average)
+    plt.plot(rho_list, averages)
+    plt.xlabel("Rho", fontsize=12)
+    plt.ylabel("Time (days)", fontsize=12)
+    plt.show()
